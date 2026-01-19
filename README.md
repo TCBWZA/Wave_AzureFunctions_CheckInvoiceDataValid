@@ -19,42 +19,68 @@ This project demonstrates a complete Azure Functions application built with **C#
 ```
 CheckInvoiceDataValid/
 +-- CheckInvoiceDataValid/              # Main function app project
-    +-- Function1.cs                     # Invoice management functions
-    +-- CustomerFunctions.cs             # Customer CRUD operations
-    +-- TelephoneNumberFunctions.cs      # Telephone number management
+    +-- CustomerFunctions.cs             # ✅ Customer CRUD operations (REFERENCE IMPLEMENTATION)
+    +-- InvoiceFunctions.cs              # ⚠️ TO BE CREATED BY STUDENTS (Exercise 1)
+    +-- TelephoneNumberFunctions.cs      # ⚠️ TO BE CREATED BY STUDENTS (Exercise 2)
     +-- DTOs/                            # Data Transfer Objects
-        +-- CreateInvoiceDto.cs
-        +-- UpdateInvoiceDto.cs
-        +-- CustomerDto.cs
-        +-- TelephoneNumberDto.cs
+        +-- CustomerDto.cs               # Complete with Create/Update variants
+        +-- InvoiceDto.cs                # Complete with Create/Update variants
+        +-- TelephoneNumberDto.cs        # Complete with Create/Update variants
     +-- host.json                        # Global function configuration
     +-- local.settings.json              # Local development settings
     +-- CheckInvoiceDataValid.csproj     # Project file
+    +-- Program.cs                       # Application entry point
 +-- SampleRolloutScript.ps1             # Deployment script with dry-run mode
 +-- instructions.md                      # Detailed setup and deployment guide
 +-- architecture-comparison.md           # Azure Functions vs Web API comparison
 +-- README.md                            # This file
 ```
 
+**Note:** The DTOs for all entities (Customer, Invoice, TelephoneNumber) are complete. Students need to create the Functions classes that use these DTOs.
+
 ## Features Implemented
 
-### 1. Invoice Functions (`Function1.cs`)
-- **CreateInvoice** - `POST /api/invoices`
-- **UpdateInvoice** - `PUT /api/invoices/{id}`
+### Customer Functions (`CustomerFunctions.cs`) - ✅ Reference Implementation
 
-### 2. Customer Functions (`CustomerFunctions.cs`)
+This is the **complete reference implementation** for students to learn from:
+
 - **CreateCustomer** - `POST /api/customers`
 - **UpdateCustomer** - `PUT /api/customers/{id}`
 - **GetCustomer** - `GET /api/customers/{id}`
 - **GetAllCustomers** - `GET /api/customers`
 - **DeleteCustomer** - `DELETE /api/customers/{id}`
 
-### 3. Telephone Number Functions (`TelephoneNumberFunctions.cs`)
+### Student Exercises - ⚠️ To Be Implemented
+
+The following functions are **intentionally left for students to implement** as learning exercises:
+
+#### 1. Invoice Functions (Exercise: Create `InvoiceFunctions.cs`)
+- **CreateInvoice** - `POST /api/invoices`
+- **UpdateInvoice** - `PUT /api/invoices/{id}`
+- **GetInvoice** - `GET /api/invoices/{id}` (optional)
+- **GetAllInvoices** - `GET /api/invoices` (optional)
+- **DeleteInvoice** - `DELETE /api/invoices/{id}` (optional)
+
+**Learning Goal:** Practice creating HTTP-triggered functions following the pattern in `CustomerFunctions.cs`.
+
+**Hints:**
+- Use `CreateInvoiceDto` and `UpdateInvoiceDto` from the DTOs folder
+- Follow the same validation pattern as CustomerFunctions
+- Invoice DTOs include: InvoiceNumber, InvoiceDate, DueDate, CustomerId, TotalAmount
+
+#### 2. Telephone Number Functions (Exercise: Create `TelephoneNumberFunctions.cs`)
 - **CreateTelephoneNumber** - `POST /api/telephone-numbers`
 - **UpdateTelephoneNumber** - `PUT /api/telephone-numbers/{id}`
-- **GetTelephoneNumber** - `GET /api/telephone-numbers/{id}`
-- **GetCustomerTelephoneNumbers** - `GET /api/customers/{customerId}/telephone-numbers`
-- **DeleteTelephoneNumber** - `DELETE /api/telephone-numbers/{id}`
+- **GetTelephoneNumber** - `GET /api/telephone-numbers/{id}` (optional)
+- **GetCustomerTelephoneNumbers** - `GET /api/customers/{customerId}/telephone-numbers` (optional)
+- **DeleteTelephoneNumber** - `DELETE /api/telephone-numbers/{id}` (optional)
+
+**Learning Goal:** Practice route parameters and validation with complex DTOs.
+
+**Hints:**
+- Use `CreateTelephoneNumberDto` and `UpdateTelephoneNumberDto`
+- Type validation: Must be "Mobile", "Work", or "DirectDial"
+- The nested route requires capturing `customerId` from the path
 
 ## Key Learning Concepts
 
@@ -195,7 +221,9 @@ Students should have installed:
 
 ## Testing the Functions
 
-### Example: Create Customer
+### Example: Create Customer (Reference Implementation)
+
+This example uses the **completed CustomerFunctions** as a reference. Students should test their Invoice and Telephone implementations similarly.
 
 **Request:**
 ```powershell
@@ -221,7 +249,54 @@ Invoke-RestMethod -Uri "http://localhost:7071/api/customers" `
 }
 ```
 
-### Example: Create Telephone Number
+### Example: Test Validation Errors
+
+**Request with invalid data:**
+```powershell
+$body = @{
+    name = ""
+    email = "invalid-email"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:7071/api/customers" `
+    -Method POST `
+    -Body $body `
+    -ContentType "application/json"
+```
+
+**Expected Response:**
+```json
+{
+  "errors": {
+    "Name": ["The Name field is required."],
+    "Email": ["Invalid email address format."]
+  }
+}
+```
+
+### Student Exercise: Test Your Invoice Implementation
+
+After completing Exercise 1, test your `CreateInvoice` function:
+
+**Request:**
+```powershell
+$body = @{
+    invoiceNumber = "INV-2024-001"
+    invoiceDate = "2024-01-15"
+    dueDate = "2024-02-15"
+    customerId = 1
+    totalAmount = 1500.50
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:7071/api/invoices" `
+    -Method POST `
+    -Body $body `
+    -ContentType "application/json"
+```
+
+### Student Exercise: Test Your Telephone Number Implementation
+
+After completing Exercise 2, test your `CreateTelephoneNumber` function:
 
 **Request:**
 ```powershell
@@ -237,7 +312,7 @@ Invoke-RestMethod -Uri "http://localhost:7071/api/telephone-numbers" `
     -ContentType "application/json"
 ```
 
-**Response:**
+**Expected Response:**
 ```json
 {
   "message": "CreateTelephoneNumber validation passed.",
@@ -301,25 +376,69 @@ Both configuration files include detailed comments explaining each setting:
 
 ## Learning Exercises
 
-### Exercise 1: Add a New Function
-**Objective:** Practice creating HTTP-triggered functions
+### Exercise 1: Implement Invoice Functions (Required)
+**Objective:** Practice creating HTTP-triggered functions by implementing the complete invoice management API
+
+**Task:** Create a new file `InvoiceFunctions.cs` with the following functions:
+1. `CreateInvoice` - POST endpoint with validation
+2. `UpdateInvoice` - PUT endpoint with ID parameter
+3. `GetInvoice` - GET endpoint to retrieve by ID (bonus)
+4. `GetAllInvoices` - GET endpoint to list all (bonus)
+5. `DeleteInvoice` - DELETE endpoint (bonus)
+
+**Hints:**
+- Copy the structure from `CustomerFunctions.cs` as a starting point
+- Use `CreateInvoiceDto` and `UpdateInvoiceDto` from the DTOs folder
+- Don't forget the `ValidateModel` helper method
+- Invoice validation includes: InvoiceNumber, InvoiceDate, DueDate, CustomerId, TotalAmount
+- Test with PowerShell after implementation
+
+**Expected Routes:**
+```
+POST   /api/invoices
+PUT    /api/invoices/{id}
+GET    /api/invoices/{id}
+GET    /api/invoices
+DELETE /api/invoices/{id}
+```
+
+### Exercise 2: Implement Telephone Number Functions (Required)
+**Objective:** Practice route parameters and complex validation patterns
+
+**Task:** Create a new file `TelephoneNumberFunctions.cs` with telephone number CRUD operations.
+
+**Hints:**
+- Type must be validated against: "Mobile", "Work", or "DirectDial"
+- Implement the nested route: `GET /api/customers/{customerId}/telephone-numbers`
+- Use `[HttpTrigger(AuthorizationLevel.Function, "get", Route = "customers/{customerId:long}/telephone-numbers")]`
+- The `RegularExpression` attribute is already on the DTO
+
+**Validation Requirements:**
+- CustomerId: Required, must be > 0
+- Type: Required, must be "Mobile", "Work", or "DirectDial"
+- Number: Required, max 50 characters
+
+### Exercise 3: Add Enhanced Validation
+**Objective:** Extend DataAnnotations validation with custom patterns
+
+**Task:** Add phone number format validation to `TelephoneNumberDto`.
+
+**Hints:**
+- Add `[RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format (E.164).")]` to Number property
+- Or use simpler pattern: `@"^[\d\s\-\+\(\)]+$"` for basic format
+- Test with valid and invalid phone numbers
+
+### Exercise 4: Add a New Function
+**Objective:** Practice creating HTTP-triggered functions from scratch
 
 **Task:** Add a `GetAllTelephoneNumbers` function that returns all telephone numbers (not filtered by customer).
 
 **Hints:**
 - Use `[HttpTrigger(AuthorizationLevel.Function, "get", Route = "telephone-numbers")]`
-- Return an `OkObjectResult` with a list
+- Return an `OkObjectResult` with an empty list (no database yet)
+- Update the route to avoid conflicts with existing routes
 
-### Exercise 2: Implement Validation
-**Objective:** Understand DataAnnotations validation
-
-**Task:** Add validation to ensure telephone numbers match a phone number pattern.
-
-**Hints:**
-- Use `[RegularExpression]` attribute
-- Pattern example: `@"^\+?[1-9]\d{1,14}$"` (E.164 format)
-
-### Exercise 3: Deploy with Environments
+### Exercise 5: Deploy with Environments
 **Objective:** Learn infrastructure as code
 
 **Task:** Deploy the same function app to dev, test, and prod environments.
