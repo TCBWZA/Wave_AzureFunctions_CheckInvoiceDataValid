@@ -1,0 +1,116 @@
+﻿<#
+.SYNOPSIS
+    Deploys a C# Azure Function with environment-specific configuration and dry-run mode.
+
+.DESCRIPTION
+    This script:
+      - Supports dev/test/prod environments
+      - Generates consistent resource names per environment
+      - Allows a dry-run mode to preview actions
+      - Deploys using Azure CLI + Functions Core Tools
+
+.PARAMETER Environment
+    Target environment: dev, test, prod
+
+.PARAMETER DryRun
+    If set, no changes are made — actions are only printed.
+
+#>
+
+# This is an example powershell script for rolling out an Azure function. 
+# Change txt to ps1 if you want to use it.
+
+param(
+    [Parameter(Mandatory=$true)]
+    [ValidateSet("dev","test","prod")]
+    [string]$Environment,
+
+    [switch]$DryRun,
+
+    [string]$SubscriptionId,
+    [string]$ProjectPath = "."
+)
+
+Write-Host "=== Azure Function Rollout Script ===" -ForegroundColor Cyan
+Write-Host "Environment: $Environment"
+Write-Host "Dry Run Mode: $DryRun"
+Write-Host ""
+
+# -----------------------------
+# Environment-specific settings
+# -----------------------------
+
+switch ($Environment) {
+    "dev" {
+        $Location = "westeurope"
+        $ResourceGroupName = "rg-func-dev"
+        $StorageAccountName = "funcdev$((Get-Random -Maximum 9999))"
+        $FunctionAppName = "funcapp-dev-$((Get-Random -Maximum 9999))"
+    }
+    "test" {
+        $Location = "westeurope"
+        $ResourceGroupName = "rg-func-test"
+        $StorageAccountName = "functest$((Get-Random -Maximum 9999))"
+        $FunctionAppName = "funcapp-test-$((Get-Random -Maximum 9999))"
+    }
+    "prod" {
+        $Location = "westeurope"
+        $ResourceGroupName = "rg-func-prod"
+        $StorageAccountName = "funcprod$((Get-Random -Maximum 9999))"
+        $FunctionAppName = "funcapp-prod-$((Get-Random -Maximum 9999))"
+    }
+}
+
+Write-Host "Resolved Configuration:"
+Write-Host "  Resource Group: $ResourceGroupName"
+Write-Host "  Storage Account: $StorageAccountName"
+Write-Host "  Function App: $FunctionAppName"
+Write-Host "  Location: $Location"
+Write-Host ""
+
+function Run-Or-DryRun {
+    param([string]$Command)
+
+    if ($DryRun) {
+        Write-Host "[DRY RUN] $Command"
+    } else {
+        Write-Host $Command
+        Invoke-Expression $Command
+    }
+}
+
+# -----------------------------
+# Azure Login
+# -----------------------------
+Run-Or-DryRun "az login --only-show-errors"
+
+if ($SubscriptionId) {
+    Run-Or-DryRun "az account set --subscription $SubscriptionId"
+}
+
+# -----------------------------
+# Resource Group
+# -----------------------------
+Run-Or-DryRun "az group create --name $ResourceGroupName --location $Location --output none"
+
+# -----------------------------
+# Storage Account
+# -----------------------------
+Run-Or-DryRun "az storage account create --name $StorageAccountName --resource-group $ResourceGroupName --location $Location --sku Standard_LRS --output none"
+
+# -----------------------------
+# Function App
+# -----------------------------
+Run-Or-DryRun "az functionapp create --name $FunctionAppName --resource-group $ResourceGroupName --storage-account $StorageAccountName --consumption-plan-location $Location --runtime dotnet --functions-version 4 --output none"
+
+# -----------------------------
+# Publish
+# -----------------------------
+if ($DryRun) {
+    Write-Host "[DRY RUN] Would publish project from $ProjectPath to $FunctionAppName"
+} else {
+    func azure functionapp publish $FunctionAppName
+}
+
+Write-Host "`nDeployment Complete" -ForegroundColor Green
+Write-Host "Function App: https://$FunctionAppName.azurewebsites.net"

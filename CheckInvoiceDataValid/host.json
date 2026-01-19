@@ -1,0 +1,50 @@
+{
+    // host.json - Global configuration file for Azure Functions
+    // This file configures runtime behavior for all functions in the app.
+    // Settings apply to both local development and Azure deployment.
+    
+    // Version of the Azure Functions host runtime configuration schema.
+    // Version 2.0 is required for Azure Functions v2+ and .NET 8 isolated worker.
+    "version": "2.0",
+    
+    // Logging configuration for the function app
+    "logging": {
+        // Application Insights specific logging settings
+        "applicationInsights": {
+            // Controls sampling of telemetry data to reduce volume and cost
+            "samplingSettings": {
+                // Enable adaptive sampling (automatically adjusts sampling rate based on traffic)
+                "isEnabled": true,
+                
+                // Types of telemetry to exclude from sampling (always collected at 100%)
+                // "Request" ensures all HTTP requests are logged without sampling
+                "excludedTypes": "Request"
+            },
+            
+            // Enable Live Metrics Stream filtering in Application Insights
+            // Allows real-time monitoring with custom filters in Azure Portal
+            "enableLiveMetricsFilters": true
+        }
+    }
+    
+    // Additional optional settings (uncomment to use):
+    
+    // Configure function timeout (default: 5 minutes for Consumption plan, 30 minutes for Premium/Dedicated)
+    // "functionTimeout": "00:05:00",
+    
+    // Control concurrent HTTP requests per instance
+    // "extensions": {
+    //     "http": {
+    //         "maxConcurrentRequests": 100,
+    //         "maxOutstandingRequests": 200,
+    //         "routePrefix": "api"
+    //     }
+    // },
+    
+    // Configure retry policies for function execution
+    // "retry": {
+    //     "strategy": "fixedDelay",
+    //     "maxRetryCount": 3,
+    //     "delayInterval": "00:00:05"
+    // }
+}

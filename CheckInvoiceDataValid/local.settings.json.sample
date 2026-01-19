@@ -1,0 +1,19 @@
+{
+  // Indicates whether the values are encrypted. Set to false for local development.
+  "IsEncrypted": false,
+  "Values": {
+    // Storage connection string for Azure Functions runtime. 
+    // "UseDevelopmentStorage=true" uses local storage emulator (Azurite).
+    // For Azure Storage: "DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+
+    // Specifies the language worker runtime for the function app.
+    // "dotnet-isolated" is required for .NET 8 isolated worker process model.
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}
