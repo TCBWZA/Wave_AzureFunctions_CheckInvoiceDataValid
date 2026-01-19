@@ -19,20 +19,25 @@ This project demonstrates a complete Azure Functions application built with **C#
 ```
 CheckInvoiceDataValid/
 +-- CheckInvoiceDataValid/              # Main function app project
-    +-- CustomerFunctions.cs             # ✅ Customer CRUD operations (REFERENCE IMPLEMENTATION)
+    +-- CustomerFunctions.cs             # ✅ Customer CRUD (DataAnnotations validation)
+    +-- CustomerFunctionsWithFluentValidation.cs  # ✅ Customer CRUD (FluentValidation)
     +-- InvoiceFunctions.cs              # ⚠️ TO BE CREATED BY STUDENTS (Exercise 1)
     +-- TelephoneNumberFunctions.cs      # ⚠️ TO BE CREATED BY STUDENTS (Exercise 2)
+    +-- Validators/                      # FluentValidation validators
+        +-- CreateCustomerValidator.cs   # ✅ Customer creation validation rules
+        +-- UpdateCustomerValidator.cs   # ✅ Customer update validation rules
     +-- DTOs/                            # Data Transfer Objects
         +-- CustomerDto.cs               # Complete with Create/Update variants
         +-- InvoiceDto.cs                # Complete with Create/Update variants
         +-- TelephoneNumberDto.cs        # Complete with Create/Update variants
     +-- host.json                        # Global function configuration
     +-- local.settings.json              # Local development settings
-    +-- CheckInvoiceDataValid.csproj     # Project file
-    +-- Program.cs                       # Application entry point
+    +-- CheckInvoiceDataValid.csproj     # Project file (includes FluentValidation)
+    +-- Program.cs                       # Application entry point (DI setup)
 +-- SampleRolloutScript.ps1             # Deployment script with dry-run mode
 +-- instructions.md                      # Detailed setup and deployment guide
 +-- architecture-comparison.md           # Azure Functions vs Web API comparison
++-- fluentvalidation-guide.md           # FluentValidation tutorial (NEW!)
 +-- README.md                            # This file
 ```
 
@@ -102,6 +107,7 @@ public async Task<IActionResult> CreateCustomer(
 - Isolated worker process model (.NET 8)
 
 ### 2. Data Validation with DataAnnotations
+
 ```csharp
 public class CreateCustomerDto
 {
@@ -120,6 +126,38 @@ public class CreateCustomerDto
 - Custom error messages
 - Regular expressions for pattern matching
 - Manual validation in isolated worker model
+
+**See also:** `CustomerFunctions.cs` for implementation
+
+### 2b. Alternative: FluentValidation (Advanced)
+
+```csharp
+public class CreateCustomerValidator : AbstractValidator<CreateCustomerDto>
+{
+    public CreateCustomerValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Name is required.")
+            .MaximumLength(200).WithMessage("Name cannot exceed 200 characters.");
+
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("Invalid email address format.");
+    }
+}
+```
+
+**Learning Points:**
+- Code-based validation (more flexible than attributes)
+- Separation of validation logic from DTOs
+- Complex conditional rules
+- Async validation support
+- Better testability
+
+**See also:** 
+- `CustomerFunctionsWithFluentValidation.cs` for implementation
+- `Validators/CreateCustomerValidator.cs` for validator class
+- `fluentvalidation-guide.md` for complete tutorial
 
 ### 3. Configuration Management
 ```json
@@ -368,11 +406,24 @@ Follow the detailed instructions in [`instructions.md`](instructions.md) for ste
   - Code comparisons
   - HTTPClient usage (consuming APIs)
 
+- **[fluentvalidation-guide.md](fluentvalidation-guide.md)** - FluentValidation Tutorial (NEW!)
+  - DataAnnotations vs FluentValidation comparison
+  - Implementation examples with CustomerFunctions
+  - Advanced validation techniques
+  - When to use each approach
+  - Student exercises
+
 ### Commented Configuration Files
 
 Both configuration files include detailed comments explaining each setting:
 - `host.json` - Runtime behavior configuration
 - `local.settings.json` - Application settings
+
+### Code Examples
+
+- **`CustomerFunctions.cs`** - Reference implementation using **DataAnnotations** validation
+- **`CustomerFunctionsWithFluentValidation.cs`** - Alternative implementation using **FluentValidation**
+- **`Validators/`** folder - FluentValidation validator classes
 
 ## Learning Exercises
 
@@ -688,9 +739,11 @@ For complex scenarios, consider using Azure API Management or reverse proxies, b
   - HTTP methods (GET, POST, PUT, DELETE)
 
 - [x] **Validation**
-  - DataAnnotations
-  - Custom error messages
-  - Manual validation in functions
+- DataAnnotations (attribute-based)
+- FluentValidation (code-based alternative)
+- Custom error messages
+- Manual validation in functions
+- Async validation patterns
 
 - [x] **Configuration**
   - `host.json` for runtime settings
