@@ -1,0 +1,141 @@
+# Test Script for FluentValidation vs DataAnnotations
+# This script demonstrates the differences between both validation approaches
+# Rename to .ps1 and run in PowerShell after starting the Azure Functions project
+
+Write-Host "=== Azure Functions Validation Comparison ===" -ForegroundColor Cyan
+Write-Host "Testing DataAnnotations vs FluentValidation" -ForegroundColor Cyan
+Write-Host ""
+
+# Ensure functions are running
+$baseUrl = "http://localhost:7071"
+
+# Test 1: Valid Customer (DataAnnotations)
+Write-Host "Test 1: Valid Customer (DataAnnotations)" -ForegroundColor Green
+$validCustomer = @{
+    name = "John Doe"
+    email = "john.doe@example.com"
+} | ConvertTo-Json
+
+try {
+    $response1 = Invoke-RestMethod -Uri "$baseUrl/api/customers" `
+        -Method POST `
+        -Body $validCustomer `
+        -ContentType "application/json"
+    
+    Write-Host "? DataAnnotations validation passed" -ForegroundColor Green
+    Write-Host ($response1 | ConvertTo-Json -Depth 3)
+} catch {
+    Write-Host "? Request failed: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host ""
+
+# Test 2: Valid Customer (FluentValidation)
+Write-Host "Test 2: Valid Customer (FluentValidation)" -ForegroundColor Green
+try {
+    $response2 = Invoke-RestMethod -Uri "$baseUrl/api/customers-fluent" `
+        -Method POST `
+        -Body $validCustomer `
+        -ContentType "application/json"
+    
+    Write-Host "? FluentValidation passed" -ForegroundColor Green
+    Write-Host ($response2 | ConvertTo-Json -Depth 3)
+} catch {
+    Write-Host "? Request failed: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host ""
+
+# Test 3: Invalid Customer (Both should fail)
+Write-Host "Test 3: Invalid Customer (Testing Validation Errors)" -ForegroundColor Yellow
+$invalidCustomer = @{
+    name = "A"  # Too short
+    email = "invalid-email"  # Invalid format
+} | ConvertTo-Json
+
+Write-Host "  Testing DataAnnotations..." -ForegroundColor Yellow
+try {
+    Invoke-RestMethod -Uri "$baseUrl/api/customers" `
+        -Method POST `
+        -Body $invalidCustomer `
+        -ContentType "application/json"
+} catch {
+    if ($_.ErrorDetails) {
+        $errorObj = $_.ErrorDetails.Message | ConvertFrom-Json
+        Write-Host "  ? Validation errors caught (DataAnnotations):" -ForegroundColor Green
+        Write-Host ($errorObj | ConvertTo-Json -Depth 3)
+    }
+}
+
+Write-Host ""
+Write-Host "  Testing FluentValidation..." -ForegroundColor Yellow
+try {
+    Invoke-RestMethod -Uri "$baseUrl/api/customers-fluent" `
+        -Method POST `
+        -Body $invalidCustomer `
+        -ContentType "application/json"
+} catch {
+    if ($_.ErrorDetails) {
+        $errorObj = $_.ErrorDetails.Message | ConvertFrom-Json
+        Write-Host "  ? Validation errors caught (FluentValidation):" -ForegroundColor Green
+        Write-Host ($errorObj | ConvertTo-Json -Depth 3)
+    }
+}
+
+Write-Host ""
+
+# Test 4: FluentValidation Advanced Features
+Write-Host "Test 4: FluentValidation Advanced - Name Pattern Validation" -ForegroundColor Cyan
+$customerWithNumbers = @{
+    name = "John123"  # Contains numbers (blocked by FluentValidation)
+    email = "john@example.com"
+} | ConvertTo-Json
+
+try {
+    Invoke-RestMethod -Uri "$baseUrl/api/customers-fluent" `
+        -Method POST `
+        -Body $customerWithNumbers `
+        -ContentType "application/json"
+} catch {
+    if ($_.ErrorDetails) {
+        $errorObj = $_.ErrorDetails.Message | ConvertFrom-Json
+        Write-Host "  ? Advanced validation caught:" -ForegroundColor Green
+        Write-Host ($errorObj | ConvertTo-Json -Depth 3)
+    }
+}
+
+Write-Host ""
+
+# Test 5: FluentValidation Temporary Email Blocking
+Write-Host "Test 5: FluentValidation Advanced - Temporary Email Blocking" -ForegroundColor Cyan
+$tempEmailCustomer = @{
+    name = "Test User"
+    email = "test@tempmail.com"  # Blocked by FluentValidation custom rule
+} | ConvertTo-Json
+
+try {
+    Invoke-RestMethod -Uri "$baseUrl/api/customers-fluent" `
+        -Method POST `
+        -Body $tempEmailCustomer `
+        -ContentType "application/json"
+} catch {
+    if ($_.ErrorDetails) {
+        $errorObj = $_.ErrorDetails.Message | ConvertFrom-Json
+        Write-Host "  ? Custom validation rule caught temporary email:" -ForegroundColor Green
+        Write-Host ($errorObj | ConvertTo-Json -Depth 3)
+    }
+}
+
+Write-Host ""
+Write-Host "=== Test Complete ===" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Key Takeaways:" -ForegroundColor Yellow
+Write-Host "  1. Both approaches catch basic validation errors" -ForegroundColor White
+Write-Host "  2. FluentValidation provides more advanced features (pattern matching, custom rules)" -ForegroundColor White
+Write-Host "  3. Error response format is consistent between both" -ForegroundColor White
+Write-Host "  4. FluentValidation is more flexible for complex scenarios" -ForegroundColor White
+Write-Host ""
+Write-Host "Next Steps:" -ForegroundColor Yellow
+Write-Host "  - Review fluentvalidation-guide.md for detailed explanation" -ForegroundColor White
+Write-Host "  - Compare CustomerFunctions.cs vs CustomerFunctionsWithFluentValidation.cs" -ForegroundColor White
+Write-Host "  - Try implementing validators for Invoice and TelephoneNumber" -ForegroundColor White
