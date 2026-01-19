@@ -14,6 +14,7 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions" Version="2.3.9" />
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.3.9" />
     <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.3.9" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.51.0" />
