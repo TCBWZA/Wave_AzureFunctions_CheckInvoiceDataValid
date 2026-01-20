@@ -1,4 +1,4 @@
-# FluentValidation in Azure Functions - Student Guide
+﻿# FluentValidation in Azure Functions - Student Guide
 
 ## Overview
 
@@ -535,4 +535,5 @@ builder.Services.AddScoped<IValidator<CreateCustomerDto>, CreateCustomerValidato
 
 ---
 
-**Module 7 Learning Goal:** Understand both validation approaches and know when to use each one! ??
+**Module 7 Learning Goal:** Understand both validation approaches and know when to use each one! 🎓
+

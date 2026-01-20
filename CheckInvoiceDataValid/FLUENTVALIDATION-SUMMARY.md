@@ -1,4 +1,4 @@
-# FluentValidation Implementation Summary
+﻿# FluentValidation Implementation Summary
 
 ## What Was Added
 
@@ -76,6 +76,7 @@ Invoke-RestMethod -Uri "http://localhost:7071/api/customers-fluent" -Method POST
 ```
 
 ### Comprehensive Test
+Rename `test-validation-approaches.txt` to `test-validation-approaches.ps1`, then run:
 ```powershell
 .\test-validation-approaches.ps1
 ```
@@ -295,11 +296,12 @@ RuleFor(x => x.Name)
 
 ---
 
-**Module 7 Enhancement Complete!** ??
+**Module 7 Enhancement Complete!** 🎉
 
 Students now have:
-- ? Reference implementation (DataAnnotations)
-- ? Alternative implementation (FluentValidation)
-- ? Comprehensive documentation
-- ? Test scripts
-- ? Exercises to practice
+- ✅ Reference implementation (DataAnnotations)
+- ✅ Alternative implementation (FluentValidation)
+- ✅ Comprehensive documentation
+- ✅ Test scripts
+- ✅ Exercises to practice
+

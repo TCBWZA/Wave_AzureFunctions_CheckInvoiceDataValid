@@ -34,14 +34,16 @@ CheckInvoiceDataValid/
     +-- local.settings.json              # Local development settings
     +-- CheckInvoiceDataValid.csproj     # Project file (includes FluentValidation)
     +-- Program.cs                       # Application entry point (DI setup)
-+-- SampleRolloutScript.ps1             # Deployment script with dry-run mode
++-- SampleRolloutScript.txt             # Deployment script template (rename to .ps1 to use)
++-- test-validation-approaches.txt      # Test script template (rename to .ps1 to use)
 +-- instructions.md                      # Detailed setup and deployment guide
 +-- architecture-comparison.md           # Azure Functions vs Web API comparison
-+-- fluentvalidation-guide.md           # FluentValidation tutorial (NEW!)
++-- fluentvalidation-guide.md           # FluentValidation tutorial
++-- isolated-worker-model-explained.md  # Isolated worker model explanation
 +-- README.md                            # This file
 ```
 
-**Note:** The DTOs for all entities (Customer, Invoice, TelephoneNumber) are complete. Students need to create the Functions classes that use these DTOs.
+**Note:** The DTOs for all entities (Customer, Invoice, TelephoneNumber) are complete and available for use in your implementations.
 
 ## Features Implemented
 
@@ -233,9 +235,9 @@ Students should have installed:
    ```
 
 3. **Run locally (Visual Studio)**
-   - Open `CheckInvoiceDataValid.sln`
-   - Press **F5** to start debugging
-   - Functions will be available at `http://localhost:7071`
+- Open `CheckInvoiceDataValid.slnx` in Visual Studio 2022
+- Press **F5** to start debugging
+- Functions will be available at `http://localhost:7071`
 
 4. **Run locally (Command Line)**
    ```powershell
@@ -406,12 +408,20 @@ Follow the detailed instructions in [`instructions.md`](instructions.md) for ste
   - Code comparisons
   - HTTPClient usage (consuming APIs)
 
-- **[fluentvalidation-guide.md](fluentvalidation-guide.md)** - FluentValidation Tutorial (NEW!)
+- **[fluentvalidation-guide.md](fluentvalidation-guide.md)** - FluentValidation Tutorial
   - DataAnnotations vs FluentValidation comparison
   - Implementation examples with CustomerFunctions
   - Advanced validation techniques
   - When to use each approach
   - Student exercises
+
+- **[isolated-worker-model-explained.md](isolated-worker-model-explained.md)** - Isolated Worker Model Explained
+  - What is the isolated worker model
+  - In-process vs isolated worker comparison
+  - Why this project uses .NET 8
+  - Code differences and examples
+  - Benefits and trade-offs
+  - Package cleanup recommendations
 
 ### Commented Configuration Files
 
@@ -842,20 +852,3 @@ For questions or issues:
 3. Ask your instructor or teaching assistant
 4. Check Azure Portal logs for deployed functions
 
-## License
-
-This example code is provided for educational purposes as part of Module 7 coursework.
-
-## Contributing
-
-This is an educational repository. Students are encouraged to:
-- Fork the repository for their own learning
-- Experiment with modifications
-- Complete the learning exercises
-- Share improvements with classmates
-
----
-
-**Happy Learning!** 🎓
-
-*Example code for demonstrating Azure Functions with .NET 8 - Module 7*

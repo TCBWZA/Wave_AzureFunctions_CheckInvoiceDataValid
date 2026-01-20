@@ -32,16 +32,23 @@ az --version
 ```
 CheckInvoiceDataValid/
 +-- CheckInvoiceDataValid/
-    +-- Function1.cs              # Invoice functions (CreateInvoice, UpdateInvoice)
+    +-- CustomerFunctions.cs             # Customer CRUD functions
+    +-- CustomerFunctionsWithFluentValidation.cs  # Customer CRUD with FluentValidation
+    +-- Validators/                      # FluentValidation validators
+        +-- CreateCustomerValidator.cs
+        +-- UpdateCustomerValidator.cs
     +-- DTOs/
-        +-- CreateInvoiceDto.cs   # DTO for creating invoices
-        +-- UpdateInvoiceDto.cs   # DTO for updating invoices
+        +-- CustomerDto.cs               # Customer DTOs with Create/Update variants
+        +-- InvoiceDto.cs                # Invoice DTOs with Create/Update variants
+        +-- TelephoneNumberDto.cs        # TelephoneNumber DTOs with Create/Update variants
     +-- CheckInvoiceDataValid.csproj
-    +-- host.json                 # Function host configuration
-    +-- local.settings.json       # Local development settings (gitignored)
-    +-- Program.cs                # Entry point and service configuration
-+-- CheckInvoiceDataValid.sln
-+-- instructions.md               # This file
+    +-- host.json                        # Function host configuration
+    +-- local.settings.json              # Local development settings (gitignored)
+    +-- Program.cs                       # Entry point and service configuration
++-- CheckInvoiceDataValid.slnx           # Solution file
++-- SampleRolloutScript.txt              # Deployment script template
++-- test-validation-approaches.txt       # Test script template
++-- instructions.md                      # This file
 ```
 
 ## Running Locally
@@ -65,16 +72,22 @@ CheckInvoiceDataValid/
    - Endpoint URLs will be displayed in the console output
 
 5. **Expected output**
-   ```
-   Azure Functions Core Tools
-   Core Tools Version:       4.x.xxxx
-   Function Runtime Version: 4.x.xxxxx
+```
+Azure Functions Core Tools
+Core Tools Version:       4.x.xxxx
+Function Runtime Version: 4.x.xxxxx
    
-   Functions:
+Functions:
    
-   CreateInvoice: [POST] http://localhost:7071/api/invoices
-   UpdateInvoice: [PUT] http://localhost:7071/api/invoices/{id:long}
-   ```
+CreateCustomer: [POST] http://localhost:7071/api/customers
+UpdateCustomer: [PUT] http://localhost:7071/api/customers/{id:long}
+GetCustomer: [GET] http://localhost:7071/api/customers/{id:long}
+GetAllCustomers: [GET] http://localhost:7071/api/customers
+DeleteCustomer: [DELETE] http://localhost:7071/api/customers/{id:long}
+   
+CreateCustomerFluentValidation: [POST] http://localhost:7071/api/customers-fluent
+UpdateCustomerFluentValidation: [PUT] http://localhost:7071/api/customers-fluent/{id:long}
+```
 
 ### Option 2: Visual Studio Code
 
