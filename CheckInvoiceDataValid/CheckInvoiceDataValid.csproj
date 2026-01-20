@@ -8,7 +8,8 @@
     <Nullable>enable</Nullable>
     <SignAssembly>False</SignAssembly>
   </PropertyGroup>
-
+	<!-- Force update on GitHub   -->
+	
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
