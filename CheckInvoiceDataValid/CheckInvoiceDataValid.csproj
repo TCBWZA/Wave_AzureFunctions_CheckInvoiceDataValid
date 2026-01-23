@@ -23,8 +23,8 @@
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 
 		<!-- Force override of Newtonsoft.Json -->
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Update="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
 
 		<!-- System packages -->
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />

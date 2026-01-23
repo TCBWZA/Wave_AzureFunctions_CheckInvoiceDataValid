@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Force all Newtonsoft.Json references to use a specific version -->
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>

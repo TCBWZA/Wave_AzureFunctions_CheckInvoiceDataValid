@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- Disable transitive package version resolution for problematic packages -->
+    <DisableTransitiveProjectReferences>false</DisableTransitiveProjectReferences>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Override all Newtonsoft.Json references to a single version -->
+    <PackageReference Update="Newtonsoft.Json">
+      <Version>13.0.3</Version>
+    </PackageReference>
+  </ItemGroup>
+</Project>
